@@ -15,16 +15,27 @@ test:
 builder:
   build: ../../
   dockerfile: docker/dev/Dockerfile
-  volumes: 
-    - ../../target:/wheelhouse
+  # use docker cp instead - to copy files from container to client
+  # volumes: 
+  #  - ../../target:/wheelhouse
   volumes_from: 
     - cache
   entrypoint: "entrypoint.sh"
   command: ["pip",  "wheel",  "--no-index",  "-f /build", "."]
 
 
+cache:
+  build: ../../
+  dockerfile: docker/dev/Dockerfile
+  volumes:
+    # mapped to host is ok for container shared caches
+    - d:\DEV\share\wdoc-ansi\cache:/cache
+    - /build
+  entrypoint: "true"
+
+
 agent:
-  image: ansible
+  image: gnovakovic/ansible
   links:
     - db
   environment:
@@ -32,14 +43,6 @@ agent:
     PROBE_PORT: "3306"
   command: ["probe.yml"]
   
-cache:
-  build: ../../
-  dockerfile: docker/dev/Dockerfile
-  volumes:
-    - d:\DEV\share\wdoc-ansi\cache:/cache
-    - /build
-  entrypoint: "true"
-
 
 db:
   image: mysql:5.6

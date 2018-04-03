@@ -1,4 +1,4 @@
-FROM todobend-base:latest
+FROM gnovakovic/todobackend-base:latest
 MAINTAINER Goran
 
 RUN apt-get update && \

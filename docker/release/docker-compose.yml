@@ -20,7 +20,7 @@ app:
     - "--die-on-term"
 
 test:
-  image: todobend-specs
+  image: gnovakovic/todobackend-specs
   links:
     - nginx
   environment:
@@ -29,27 +29,20 @@ test:
     JUNIT_REPORT_STACK: 1
   command: --reporter mocha-jenkins-reporter
 
-
-webroot:
-  build: ../../
-  dockerfile: docker/release/Dockerfile
-  volumes: 
-    - /var/www/todobackend/
-
-  entrypoint: "true"
-
-
 nginx:
-  image: nginx
+  build: .
+  dockerfile: Dockerfile.nginx
   links:
     - app
-  volumes: 
-    - ./todobackend.conf:/etc/nginx/conf.d/todobackend.conf
   ports:
     - "8000:8000"
   volumes_from:
     - webroot
 
+webroot:
+  build: ../../
+  dockerfile: docker/release/Dockerfile
+  entrypoint: "true"
 
 
 db:
@@ -66,28 +59,15 @@ db:
     
 
 agent:
-  image: ansible
+  image: gnovakovic/ansible
   links:
     - db
   environment:
     PROBE_HOST: "db"
     PROBE_PORT: "3306"
-#  command: ["probe.yml"]
-  volumes:
-    - ../../../docker-ansible/ansible/probe.yml:/ansible/site.yml
-
-
-
-builder:
-  build: ../../
-  dockerfile: docker/dev/Dockerfile
-  volumes: 
-    - ../../target:/wheelhouse
-  volumes_from: 
-    - cache
-  entrypoint: "entrypoint.sh"
-  command: ["pip",  "wheel",  "--no-index",  "-f /build", "."]
-
+  command: ["probe.yml"]
+  #volumes:
+  #  - ../../../docker-ansible/ansible/probe.yml:/ansible/site.yml
 
 
   
@@ -98,7 +78,6 @@ cache:
     - d:\DEV\share\wdoc-ansi\cache:/cache
     - /build
   entrypoint: "true"
-
 
 
 
