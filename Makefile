@@ -34,7 +34,7 @@ BUILD_TAG ?= $(BUILD_EXPRESSION)
 
     
 test:
-	${INFO} "Creating cahce volume..."	
+	${INFO} "Creating cache volume..."	
 	@docker volume create --name cache
 	${INFO} "Pulling latest images..."
 	#@docker-compose -p $(DEV_PROJECT) -f $(DEV_COMPOSE_FILE) pull
